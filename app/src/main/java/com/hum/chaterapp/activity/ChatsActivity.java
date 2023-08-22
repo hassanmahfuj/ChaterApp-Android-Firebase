@@ -74,25 +74,11 @@ public class ChatsActivity extends AppCompatActivity {
         userChatQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                GenericTypeIndicator<HashMap<String, Object>> _ind = new GenericTypeIndicator<HashMap<String, Object>>() {};
+                GenericTypeIndicator<HashMap<String, Object>> _ind = new GenericTypeIndicator<HashMap<String, Object>>() {
+                };
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
-                    HashMap <String, Object> map = data.getValue(_ind);
+                    HashMap<String, Object> map = data.getValue(_ind);
                     chatsList.add(map);
-//                    DatabaseReference messagesRef = userChatsRef.child(chatId).child("messages");
-
-//                    messagesRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//                        @Override
-//                        public void onDataChange(DataSnapshot messagesSnapshot) {
-//                            for (DataSnapshot messageSnapshot : messagesSnapshot.getChildren()) {
-//                                // Process each message here
-//                            }
-//                        }
-//
-//                        @Override
-//                        public void onCancelled(DatabaseError databaseError) {
-//                            // Handle error
-//                        }
-//                    });
                 }
                 recChats.getAdapter().notifyDataSetChanged();
             }

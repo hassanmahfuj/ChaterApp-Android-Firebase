@@ -1,6 +1,7 @@
 package com.hum.chaterapp.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,6 +20,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.hum.chaterapp.R;
+import com.hum.chaterapp.activity.MessagesActivity;
 import com.hum.chaterapp.service.Firebase;
 
 import java.text.SimpleDateFormat;
@@ -95,6 +98,12 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsAdapter.ViewHolder> 
         c.setTimeInMillis((long) lastMessage.get("timestamp"));
         String format = n.getTimeInMillis() - c.getTimeInMillis() > 1000 * 60 * 60 * 24 ? "dd/MM/yy" : "hh:mm a";
         holder.txtTimestamp.setText(new SimpleDateFormat(format).format(c.getTime()));
+
+        holder.itemView.setOnClickListener(view -> {
+            Intent i = new Intent(holder.itemView.getContext(), MessagesActivity.class);
+            i.putExtra("chatId", mItems.get(position).get("chatId").toString());
+            holder.itemView.getContext().startActivity(i);
+        });
     }
 
     @Override
