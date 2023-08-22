@@ -9,11 +9,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.hum.chaterapp.R;
@@ -21,7 +23,9 @@ import com.hum.chaterapp.adapter.ChatsAdapter;
 import com.hum.chaterapp.service.Firebase;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ChatsActivity extends AppCompatActivity {
 
@@ -57,14 +61,6 @@ public class ChatsActivity extends AppCompatActivity {
         Firebase.get().updateLastSeen();
 
         chatsList = new ArrayList<>();
-        HashMap<String, Object> m = new HashMap<>();
-        m.put("name", "Hassan");
-        chatsList.add(m);
-
-        m = new HashMap<>();
-        m.put("name", "Mahfuj");
-        chatsList.add(m);
-
         ChatsAdapter adapter = new ChatsAdapter(chatsList);
         recChats.setLayoutManager(new LinearLayoutManager(this));
         recChats.setAdapter(adapter);
@@ -74,15 +70,14 @@ public class ChatsActivity extends AppCompatActivity {
 
     public void fetchMessagesForUser(String userId) {
         DatabaseReference userChatsRef = Firebase.get().ref().child("chats");
-
         Query userChatQuery = userChatsRef.orderByChild("participants/" + userId).equalTo(true);
-
         userChatQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot chatSnapshot : dataSnapshot.getChildren()) {
-                    String chatId = chatSnapshot.getKey();
-                    Log.d("ChatsActivity", chatId);
+                GenericTypeIndicator<HashMap<String, Object>> _ind = new GenericTypeIndicator<HashMap<String, Object>>() {};
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    HashMap <String, Object> map = data.getValue(_ind);
+                    chatsList.add(map);
 //                    DatabaseReference messagesRef = userChatsRef.child(chatId).child("messages");
 
 //                    messagesRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -99,12 +94,17 @@ public class ChatsActivity extends AppCompatActivity {
 //                        }
 //                    });
                 }
+                recChats.getAdapter().notifyDataSetChanged();
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // Handle error
+            public void onCancelled(DatabaseError e) {
+                showMessage(e.getMessage());
             }
         });
+    }
+
+    private void showMessage(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }

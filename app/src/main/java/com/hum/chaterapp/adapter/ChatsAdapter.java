@@ -1,6 +1,7 @@
 package com.hum.chaterapp.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,10 +12,20 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.hum.chaterapp.R;
+import com.hum.chaterapp.service.Firebase;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ChatsAdapter extends RecyclerView.Adapter<ChatsAdapter.ViewHolder> {
 
@@ -52,7 +63,38 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ChatsAdapter.ViewHolder holder, int position) {
-        holder.txtName.setText(mItems.get(position).get("name").toString());
+        // if this is a private message getting the name from user id of recipient
+        if(mItems.get(position).get("type").toString().equals("private")) {
+            String[] ids = ((Map<String, Boolean>) mItems.get(position).get("participants")).keySet().toArray(new String[0]);
+            for(String id : ids) {
+                if(!FirebaseAuth.getInstance().getUid().equals(id)) {
+                    DatabaseReference usersRef = Firebase.get().ref().child("users").child(id);
+                    usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.exists()) {
+                                String name = dataSnapshot.child("name").getValue(String.class);
+                                holder.txtName.setText(name);
+                            }
+                        }
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                        }
+                    });
+                }
+            }
+        }
+
+        // getting the last message from all messages
+        Map<String, Object> messages = ((Map<String, Object>) mItems.get(position).get("messages"));
+        Map<String, Object> lastMessage = (Map<String, Object>) messages.get(Collections.max(messages.keySet()));
+        // setting last message and time
+        holder.txtLastMessage.setText(lastMessage.get("text").toString());
+        Calendar n = Calendar.getInstance();
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis((long) lastMessage.get("timestamp"));
+        String format = n.getTimeInMillis() - c.getTimeInMillis() > 1000 * 60 * 60 * 24 ? "dd/MM/yy" : "hh:mm a";
+        holder.txtTimestamp.setText(new SimpleDateFormat(format).format(c.getTime()));
     }
 
     @Override
