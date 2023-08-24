@@ -14,9 +14,9 @@ public class User {
     public User() {
     }
 
-    public User(String userId, String phone) {
+    public User(String userId, String name) {
         this.userId = userId;
-        this.phone = phone;
+        this.name = name;
     }
 
     public String getUserId() {
@@ -65,5 +65,17 @@ public class User {
 
     public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "userId='" + userId + '\'' +
+                ", phone='" + phone + '\'' +
+                ", name='" + name + '\'' +
+                ", photo='" + photo + '\'' +
+                ", lastSeen=" + lastSeen +
+                ", createdAt=" + createdAt +
+                '}';
     }
 }

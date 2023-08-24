@@ -70,8 +70,8 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsAdapter.ViewHolder> 
         if(mItems.get(position).get("type").toString().equals("private")) {
             String[] ids = ((Map<String, Boolean>) mItems.get(position).get("participants")).keySet().toArray(new String[0]);
             for(String id : ids) {
-                if(!FirebaseAuth.getInstance().getUid().equals(id)) {
-                    DatabaseReference usersRef = Firebase.get().ref().child("users").child(id);
+                if(!Firebase.use().getUserId().equals(id)) {
+                    DatabaseReference usersRef = Firebase.use().ref().child("users").child(id);
                     usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {

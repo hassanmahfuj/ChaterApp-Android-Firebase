@@ -55,19 +55,13 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull MessagesAdapter.ViewHolder holder, int position) {
-        // getting the last message from all messages
-//        Map<String, Object> messages = ((Map<String, Object>) mItems.get(position).get("messages"));
-//        Map<String, Object> lastMessage = (Map<String, Object>) messages.get(Collections.max(messages.keySet()));
-        // setting last message and time
-//        holder.txtMessage.setText(lastMessage.get("text").toString());
-//        Calendar n = Calendar.getInstance();
-//        Calendar c = Calendar.getInstance();
-//        c.setTimeInMillis((long) lastMessage.get("timestamp"));
-//        String format = n.getTimeInMillis() - c.getTimeInMillis() > 1000 * 60 * 60 * 24 ? "dd/MM/yy" : "hh:mm a";
-//        holder.txtTimestamp.setText(new SimpleDateFormat(format).format(c.getTime()));
+        Calendar n = Calendar.getInstance();
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis((long) mItems.get(position).get("timestamp"));
+        String format = n.getTimeInMillis() - c.getTimeInMillis() > 1000 * 60 * 60 * 24 ? "dd/MM/yy" : "hh:mm a";
+        holder.txtTimestamp.setText(new SimpleDateFormat(format).format(c.getTime()));
 
         holder.txtMessage.setText(mItems.get(position).get("text").toString());
-
     }
 
     @Override

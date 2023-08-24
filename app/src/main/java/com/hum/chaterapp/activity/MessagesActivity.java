@@ -22,6 +22,7 @@ import com.hum.chaterapp.service.Firebase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class MessagesActivity extends AppCompatActivity {
 
@@ -49,12 +50,13 @@ public class MessagesActivity extends AppCompatActivity {
 
         chatId = getIntent().getStringExtra("chatId");
 
-        DatabaseReference messagesRef = Firebase.get().ref().child("chats").child(chatId).child("messages");
-        messagesRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference messagesRef = Firebase.use().ref().child("chats").child(chatId).child("messages");
+        messagesRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot messagesSnapshot) {
                 GenericTypeIndicator<HashMap<String, Object>> _ind = new GenericTypeIndicator<HashMap<String, Object>>() {
                 };
+                messagesList.clear();
                 for (DataSnapshot data : messagesSnapshot.getChildren()) {
                     HashMap<String, Object> map = data.getValue(_ind);
                     messagesList.add(map);
@@ -67,6 +69,26 @@ public class MessagesActivity extends AppCompatActivity {
                 showMessage(e.getMessage());
             }
         });
+
+        btnSendMessage.setOnClickListener(view -> {
+            sendMessage(chatId, Firebase.use().getUserId(), txtMessage.getText().toString());
+            txtMessage.setText("");
+        });
+    }
+
+    private void sendMessage(String chatId, String senderId, String messageText) {
+            DatabaseReference messagesRef = Firebase.use().ref().child("chats").child(chatId).child("messages");
+
+            String messageId = messagesRef.push().getKey();
+            long timestamp = System.currentTimeMillis();
+
+            Map<String, Object> messageData = new HashMap<>();
+            messageData.put("sender", senderId);
+            messageData.put("timestamp", timestamp);
+            messageData.put("text", messageText);
+
+            messagesRef.child(messageId).setValue(messageData);
+
     }
 
     private void showMessage(String message) {
