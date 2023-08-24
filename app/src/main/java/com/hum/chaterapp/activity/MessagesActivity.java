@@ -18,6 +18,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.hum.chaterapp.R;
 import com.hum.chaterapp.adapter.ChatsAdapter;
 import com.hum.chaterapp.adapter.MessagesAdapter;
+import com.hum.chaterapp.model.Message;
 import com.hum.chaterapp.service.Firebase;
 
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class MessagesActivity extends AppCompatActivity {
     private RecyclerView recMessages;
     private TextView txtMessage;
     private Button btnSendMessage;
-    private ArrayList<HashMap<String, Object>> messagesList;
+    private ArrayList<Message> messagesList;
     private String chatId;
 
     @Override
@@ -48,18 +49,15 @@ public class MessagesActivity extends AppCompatActivity {
         recMessages.setLayoutManager(new LinearLayoutManager(this));
         recMessages.setAdapter(adapter);
 
+        txtUsername.setText(getIntent().getStringExtra("name"));
         chatId = getIntent().getStringExtra("chatId");
 
-        DatabaseReference messagesRef = Firebase.use().ref().child("chats").child(chatId).child("messages");
-        messagesRef.addValueEventListener(new ValueEventListener() {
+        Firebase.use().getMessagesByChatId(chatId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot messagesSnapshot) {
-                GenericTypeIndicator<HashMap<String, Object>> _ind = new GenericTypeIndicator<HashMap<String, Object>>() {
-                };
                 messagesList.clear();
                 for (DataSnapshot data : messagesSnapshot.getChildren()) {
-                    HashMap<String, Object> map = data.getValue(_ind);
-                    messagesList.add(map);
+                    messagesList.add(data.getValue(Message.class));
                 }
                 recMessages.getAdapter().notifyDataSetChanged();
             }
@@ -83,7 +81,7 @@ public class MessagesActivity extends AppCompatActivity {
             long timestamp = System.currentTimeMillis();
 
             Map<String, Object> messageData = new HashMap<>();
-            messageData.put("sender", senderId);
+            messageData.put("senderId", senderId);
             messageData.put("timestamp", timestamp);
             messageData.put("text", messageText);
 

@@ -68,24 +68,13 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull ChatsAdapter.ViewHolder holder, int position) {
         // if this is a private message getting the name from user id of recipient
         if(mItems.get(position).get("type").toString().equals("private")) {
-            String[] ids = ((Map<String, Boolean>) mItems.get(position).get("participants")).keySet().toArray(new String[0]);
-            for(String id : ids) {
-                if(!Firebase.use().getUserId().equals(id)) {
-                    DatabaseReference usersRef = Firebase.use().ref().child("users").child(id);
-                    usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            if (dataSnapshot.exists()) {
-                                String name = dataSnapshot.child("name").getValue(String.class);
-                                holder.txtName.setText(name);
-                            }
-                        }
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                        }
-                    });
-                }
-            }
+//            String[] ids = ((Map<String, Boolean>) mItems.get(position).get("participants")).keySet().toArray(new String[0]);
+//            for(String id : ids) {
+//                if(!Firebase.use().getUserId().equals(id)) {
+//                    holder.txtName.setText(Firebase.use().getUser(id).getName());
+//                }
+//            }
+              holder.txtName.setText(Firebase.use().getRecipientName(mItems.get(position).get("participants")));
         }
 
         // getting the last message from all messages
@@ -101,6 +90,7 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsAdapter.ViewHolder> 
 
         holder.itemView.setOnClickListener(view -> {
             Intent i = new Intent(holder.itemView.getContext(), MessagesActivity.class);
+            i.putExtra("name", holder.txtName.getText());
             i.putExtra("chatId", mItems.get(position).get("chatId").toString());
             holder.itemView.getContext().startActivity(i);
         });

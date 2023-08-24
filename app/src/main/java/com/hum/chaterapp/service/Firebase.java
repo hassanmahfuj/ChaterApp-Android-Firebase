@@ -1,5 +1,7 @@
 package com.hum.chaterapp.service;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -12,6 +14,7 @@ import com.hum.chaterapp.model.User;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Firebase {
     public static final String USERS_NODE = "users";
@@ -20,11 +23,12 @@ public class Firebase {
     private static Firebase firebaseInstance;
     private HashMap<String, User> users;
 
-    private Firebase() {}
+    private Firebase() {
+    }
 
     // singleton solution
     public static synchronized Firebase use() {
-        if(firebaseInstance == null) {
+        if (firebaseInstance == null) {
             firebaseInstance = new Firebase();
         }
         return firebaseInstance;
@@ -55,26 +59,25 @@ public class Firebase {
 
     }
 
-    public void getMessagesByUserIdAndChatId() {
-
+    public DatabaseReference getMessagesByChatId(String chatId) {
+        return ref().child(CHATS_NODE).child(chatId).child("messages");
     }
-
 
     // get user details solution
     public void initUsers(Callback callback) {
         users = new HashMap<>();
-        ref().child(USERS_NODE).addValueEventListener(new ValueEventListener() {
+        ref().child(USERS_NODE).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot data : snapshot.getChildren()) {
                     users.put(data.getKey(), data.getValue(User.class));
                 }
                 callback.onComplete();
+                Log.d("logs", users.keySet().toString());
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
     }
@@ -87,8 +90,15 @@ public class Firebase {
         return users.get(userId);
     }
 
-    public boolean isCurrentUser(String userId) {
-        return users.containsKey(userId);
+    public String getRecipientName(Object participants) {
+        String name = "ChaterApp User";
+        String[] ids = ((Map<String, Boolean>) participants).keySet().toArray(new String[0]);
+        for(String id : ids) {
+            if(!Firebase.use().getUserId().equals(id)) {
+                name = Firebase.use().getUser(id).getName();
+            }
+        }
+        return name;
     }
 
     public interface Callback {

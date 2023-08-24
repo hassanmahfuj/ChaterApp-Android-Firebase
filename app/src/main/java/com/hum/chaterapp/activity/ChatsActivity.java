@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -31,10 +32,7 @@ import java.util.Map;
 
 public class ChatsActivity extends AppCompatActivity {
 
-    private Button btnLogout;
     private FloatingActionButton fab;
-    private TextView txtName;
-    private TextView txtPhone;
     private RecyclerView recChats;
     private ArrayList<HashMap<String, Object>> chatsList;
 
@@ -43,36 +41,24 @@ public class ChatsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chats);
 
-        btnLogout = findViewById(R.id.btn_logout);
         fab = findViewById(R.id.fab);
-        txtName = findViewById(R.id.txt_name);
-        txtPhone = findViewById(R.id.txt_phone);
         recChats = findViewById(R.id.rec_chats);
 
-        btnLogout.setOnClickListener(view -> {
-            FirebaseAuth.getInstance().signOut();
-            startActivity(new Intent(ChatsActivity.this, LoginActivity.class));
-            finish();
+        MaterialToolbar topAppBar = findViewById(R.id.topAppBar);
+        topAppBar.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == R.id.action_profile) {
+                startActivity(new Intent(ChatsActivity.this, ProfileActivity.class));
+                return true;
+            }
+            return false;
         });
 
         fab.setOnClickListener(view -> {
             startActivity(new Intent(ChatsActivity.this, NewChatActivity.class));
         });
 
-        txtName.setText(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
-        txtPhone.setText(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber());
-
         // TODO: update this every five second if activity is visible
         // Firebase.get().updateLastSeen();
-
-        Log.d("logs", Firebase.use().getUser("+8801712345678").toString());
-
-        User a = Firebase.use().getUser("+8801712345678");
-        if(a.getPhoto() != null) {
-            Log.d("logs", "true");
-        } else {
-            Log.d("logs", "false");
-        }
 
         chatsList = new ArrayList<>();
         ChatsAdapter adapter = new ChatsAdapter(chatsList);
