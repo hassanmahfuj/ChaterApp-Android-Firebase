@@ -49,7 +49,10 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/txt_recipient_number"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:maxLength="11"
+                android:textSize="18sp" />
 
         </com.google.android.material.textfield.TextInputLayout>
 

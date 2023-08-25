@@ -49,12 +49,12 @@ public class Firebase {
     }
 
     public void sendMessage(String chatId, Message message) {
-        DatabaseReference messagesRef = Firebase.use().ref().child(MESSAGES_NODE).child(chatId);
+        DatabaseReference messagesRef = ref().child(MESSAGES_NODE).child(chatId);
         String messageId = messagesRef.push().getKey();
         messagesRef.child(messageId).setValue(message);
 
         // set last message to chat node
-        DatabaseReference chatsRef = Firebase.use().ref().child(CHATS_NODE).child(chatId);
+        DatabaseReference chatsRef = ref().child(CHATS_NODE).child(chatId);
         chatsRef.child("lastMessage").setValue(message);
     }
 
@@ -68,13 +68,16 @@ public class Firebase {
                     users.put(data.getKey(), data.getValue(User.class));
                 }
                 callback.onComplete();
-                Log.d("logs", users.keySet().toString());
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }
         });
+    }
+
+    public void updateUser(User user) {
+        ref().child(USERS_NODE).child(user.getUserId()).setValue(user);
     }
 
     public User getUser() {
@@ -98,6 +101,10 @@ public class Firebase {
             }
         }
         return name;
+    }
+
+    public void createNewUser(User user) {
+        ref().child(USERS_NODE).child(user.getUserId()).setValue(user);
     }
 
     public interface Callback {
