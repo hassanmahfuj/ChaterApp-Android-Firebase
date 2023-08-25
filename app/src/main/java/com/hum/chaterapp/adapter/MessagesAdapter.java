@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,26 +66,29 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
         c.setTimeInMillis(mItems.get(position).getTimestamp());
         String format = n.getTimeInMillis() - c.getTimeInMillis() > 1000 * 60 * 60 * 24 ? "dd/MM/yy" : "hh:mm a";
         holder.txtTimestamp.setText(new SimpleDateFormat(format).format(c.getTime()));
-
         holder.txtMessage.setText(mItems.get(position).getText());
 
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, // Width
-                LinearLayout.LayoutParams.WRAP_CONTENT // Height
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
         );
         int leftMargin;
-        int topMargin = pixelToDp(8);;
+        int topMargin = pixelToDp(5);
         int rightMargin;
-        int bottomMargin = pixelToDp(8);
+        int bottomMargin = pixelToDp(5);
+
         if (Firebase.use().getUserId().equals(mItems.get(position).getSenderId())) {
-            holder.itemView.setBackgroundColor(Color.parseColor("#FF00FF"));
-            leftMargin = pixelToDp(30);
-            rightMargin = pixelToDp(8);
+            holder.linHolder.setBackgroundResource(R.drawable.right_message_bg);
+            layoutParams.gravity = Gravity.END;
+            leftMargin = pixelToDp(50);
+            rightMargin = pixelToDp(5);
         } else {
-            holder.itemView.setBackgroundColor(Color.parseColor("#FF0000"));
-            leftMargin = pixelToDp(8);
-            rightMargin = pixelToDp(30);
+            holder.linHolder.setBackgroundResource(R.drawable.left_message_bg);
+            layoutParams.gravity = Gravity.START;
+            leftMargin = pixelToDp(5);
+            rightMargin = pixelToDp(50);
         }
+
         layoutParams.setMargins(leftMargin, topMargin, rightMargin, bottomMargin);
         holder.linHolder.setLayoutParams(layoutParams);
     }

@@ -57,9 +57,6 @@ public class ChatsActivity extends AppCompatActivity {
             startActivity(new Intent(ChatsActivity.this, NewChatActivity.class));
         });
 
-        // TODO: update this every five second if activity is visible
-        // Firebase.get().updateLastSeen();
-
         chatsList = new ArrayList<>();
         ChatsAdapter adapter = new ChatsAdapter(chatsList);
         recChats.setLayoutManager(new LinearLayoutManager(this));

@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DatabaseReference;
 import com.hum.chaterapp.R;
@@ -18,6 +20,7 @@ public class NewChatActivity extends AppCompatActivity {
 
     private EditText txtRecipientNumber;
     private Button btnStartChat;
+    private ImageView actionBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,10 +29,23 @@ public class NewChatActivity extends AppCompatActivity {
 
         txtRecipientNumber = findViewById(R.id.txt_recipient_number);
         btnStartChat = findViewById(R.id.btn_start_chat);
+        actionBack = findViewById(R.id.action_back);
 
         btnStartChat.setOnClickListener(view -> {
-            createNewChat("", new String[]{Firebase.use().getUserId(), txtRecipientNumber.getText().toString()});
+            String[] participantIds = new String[]{
+                    Firebase.use().getUserId(),
+                    txtRecipientNumber.getText().toString()
+            };
+            for (String id : participantIds) {
+                if (!Firebase.use().isUserRegistered(id)) {
+                    showMessage(id + " is not registered!");
+                    return;
+                }
+            }
+            createNewChat("", participantIds);
         });
+
+        actionBack.setOnClickListener(view -> finish());
     }
 
     private void createNewChat(String chatName, String[] participantIds) {
@@ -51,7 +67,12 @@ public class NewChatActivity extends AppCompatActivity {
 
         Intent i = new Intent(NewChatActivity.this, MessagesActivity.class);
         i.putExtra("chatId", chatId);
+        i.putExtra("name", txtRecipientNumber.getText().toString());
         startActivity(i);
         finish();
+    }
+
+    private void showMessage(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }

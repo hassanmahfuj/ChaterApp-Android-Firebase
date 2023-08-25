@@ -68,12 +68,6 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull ChatsAdapter.ViewHolder holder, int position) {
         // if this is a private message getting the name from user id of recipient
         if(mItems.get(position).get("type").toString().equals("private")) {
-//            String[] ids = ((Map<String, Boolean>) mItems.get(position).get("participants")).keySet().toArray(new String[0]);
-//            for(String id : ids) {
-//                if(!Firebase.use().getUserId().equals(id)) {
-//                    holder.txtName.setText(Firebase.use().getUser(id).getName());
-//                }
-//            }
               holder.txtName.setText(Firebase.use().getRecipientName(mItems.get(position).get("participants")));
         }
 

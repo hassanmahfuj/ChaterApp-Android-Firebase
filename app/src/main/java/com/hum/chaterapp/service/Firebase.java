@@ -10,6 +10,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.hum.chaterapp.model.Message;
 import com.hum.chaterapp.model.User;
 
 import java.util.Date;
@@ -49,18 +50,14 @@ public class Firebase {
         ref().child(USERS_NODE).child(userId).updateChildren(m);
     }
 
-    public void updateLastSeen() {
-        HashMap<String, Object> m = new HashMap<>();
-        m.put("lastSeen", new Date().getTime());
-        ref().child(USERS_NODE).child(getUserId()).updateChildren(m);
-    }
-
-    public void getChatsByUserId() {
-
-    }
-
     public DatabaseReference getMessagesByChatId(String chatId) {
         return ref().child(CHATS_NODE).child(chatId).child("messages");
+    }
+
+    public void sendMessage(String chatId, Message message) {
+        DatabaseReference messagesRef = Firebase.use().ref().child(CHATS_NODE).child(chatId).child("messages");
+        String messageId = messagesRef.push().getKey();
+        messagesRef.child(messageId).setValue(message);
     }
 
     // get user details solution
@@ -88,6 +85,10 @@ public class Firebase {
 
     public User getUser(String userId) {
         return users.get(userId);
+    }
+
+    public boolean isUserRegistered(String userId) {
+        return users.containsKey(userId);
     }
 
     public String getRecipientName(Object participants) {

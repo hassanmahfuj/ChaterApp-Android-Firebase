@@ -1,11 +1,13 @@
 package com.hum.chaterapp.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +33,8 @@ public class MessagesActivity extends AppCompatActivity {
     private RecyclerView recMessages;
     private TextView txtMessage;
     private Button btnSendMessage;
+    private ImageView actionBack;
+
     private ArrayList<Message> messagesList;
     private String chatId;
 
@@ -43,6 +47,7 @@ public class MessagesActivity extends AppCompatActivity {
         recMessages = findViewById(R.id.rec_messages);
         txtMessage = findViewById(R.id.txt_message);
         btnSendMessage = findViewById(R.id.btn_send_message);
+        actionBack = findViewById(R.id.action_back);
 
         messagesList = new ArrayList<>();
         MessagesAdapter adapter = new MessagesAdapter(messagesList);
@@ -54,12 +59,13 @@ public class MessagesActivity extends AppCompatActivity {
 
         Firebase.use().getMessagesByChatId(chatId).addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot messagesSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot messagesSnapshot) {
                 messagesList.clear();
                 for (DataSnapshot data : messagesSnapshot.getChildren()) {
                     messagesList.add(data.getValue(Message.class));
                 }
                 recMessages.getAdapter().notifyDataSetChanged();
+                recMessages.scrollToPosition(messagesList.size() - 1);
             }
 
             @Override
@@ -69,24 +75,15 @@ public class MessagesActivity extends AppCompatActivity {
         });
 
         btnSendMessage.setOnClickListener(view -> {
-            sendMessage(chatId, Firebase.use().getUserId(), txtMessage.getText().toString());
+            Message message = new Message();
+            message.setSenderId(Firebase.use().getUserId());
+            message.setTimestamp(System.currentTimeMillis());
+            message.setText(txtMessage.getText().toString());
+            Firebase.use().sendMessage(chatId, message);
             txtMessage.setText("");
         });
-    }
 
-    private void sendMessage(String chatId, String senderId, String messageText) {
-            DatabaseReference messagesRef = Firebase.use().ref().child("chats").child(chatId).child("messages");
-
-            String messageId = messagesRef.push().getKey();
-            long timestamp = System.currentTimeMillis();
-
-            Map<String, Object> messageData = new HashMap<>();
-            messageData.put("senderId", senderId);
-            messageData.put("timestamp", timestamp);
-            messageData.put("text", messageText);
-
-            messagesRef.child(messageId).setValue(messageData);
-
+        actionBack.setOnClickListener(view -> finish());
     }
 
     private void showMessage(String message) {
