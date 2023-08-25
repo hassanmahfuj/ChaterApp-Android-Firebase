@@ -21,6 +21,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.hum.chaterapp.R;
 import com.hum.chaterapp.activity.MessagesActivity;
+import com.hum.chaterapp.model.Chat;
 import com.hum.chaterapp.service.Firebase;
 
 import java.text.SimpleDateFormat;
@@ -32,9 +33,9 @@ import java.util.Map;
 
 public class ChatsAdapter extends RecyclerView.Adapter<ChatsAdapter.ViewHolder> {
 
-    public ArrayList<HashMap<String, Object>> mItems;
+    public ArrayList<Chat> mItems;
 
-    public ChatsAdapter(ArrayList<HashMap<String, Object>> items) {
+    public ChatsAdapter(ArrayList<Chat> items) {
         mItems = items;
     }
 
@@ -67,25 +68,21 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ChatsAdapter.ViewHolder holder, int position) {
         // if this is a private message getting the name from user id of recipient
-        if(mItems.get(position).get("type").toString().equals("private")) {
-              holder.txtName.setText(Firebase.use().getRecipientName(mItems.get(position).get("participants")));
+        if (mItems.get(position).getType().equals("private")) {
+            holder.txtName.setText(Firebase.use().getRecipientName(mItems.get(position).getParticipants()));
         }
 
-        // getting the last message from all messages
-        Map<String, Object> messages = ((Map<String, Object>) mItems.get(position).get("messages"));
-        Map<String, Object> lastMessage = (Map<String, Object>) messages.get(Collections.max(messages.keySet()));
-        // setting last message and time
-        holder.txtLastMessage.setText(lastMessage.get("text").toString());
+        holder.txtLastMessage.setText(mItems.get(position).getLastMessage().getText());
         Calendar n = Calendar.getInstance();
         Calendar c = Calendar.getInstance();
-        c.setTimeInMillis((long) lastMessage.get("timestamp"));
+        c.setTimeInMillis(mItems.get(position).getLastMessage().getTimestamp());
         String format = n.getTimeInMillis() - c.getTimeInMillis() > 1000 * 60 * 60 * 24 ? "dd/MM/yy" : "hh:mm a";
         holder.txtTimestamp.setText(new SimpleDateFormat(format).format(c.getTime()));
 
         holder.itemView.setOnClickListener(view -> {
             Intent i = new Intent(holder.itemView.getContext(), MessagesActivity.class);
             i.putExtra("name", holder.txtName.getText());
-            i.putExtra("chatId", mItems.get(position).get("chatId").toString());
+            i.putExtra("chatId", mItems.get(position).getChatId());
             holder.itemView.getContext().startActivity(i);
         });
     }
@@ -95,7 +92,7 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsAdapter.ViewHolder> 
         return mItems.size();
     }
 
-    public ArrayList<HashMap<String, Object>> getItems() {
+    public ArrayList<Chat> getItems() {
         return mItems;
     }
 }

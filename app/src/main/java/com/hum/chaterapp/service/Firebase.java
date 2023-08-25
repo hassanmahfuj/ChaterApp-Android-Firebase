@@ -20,6 +20,7 @@ import java.util.Map;
 public class Firebase {
     public static final String USERS_NODE = "users";
     public static final String CHATS_NODE = "chats";
+    public static final String MESSAGES_NODE = "messages";
 
     private static Firebase firebaseInstance;
     private HashMap<String, User> users;
@@ -43,21 +44,18 @@ public class Firebase {
         return FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber();
     }
 
-    public void saveUser(String userId, String phone) {
-        HashMap<String, Object> m = new HashMap<>();
-        m.put("userId", userId);
-        m.put("phone", phone);
-        ref().child(USERS_NODE).child(userId).updateChildren(m);
-    }
-
     public DatabaseReference getMessagesByChatId(String chatId) {
-        return ref().child(CHATS_NODE).child(chatId).child("messages");
+        return ref().child(MESSAGES_NODE).child(chatId);
     }
 
     public void sendMessage(String chatId, Message message) {
-        DatabaseReference messagesRef = Firebase.use().ref().child(CHATS_NODE).child(chatId).child("messages");
+        DatabaseReference messagesRef = Firebase.use().ref().child(MESSAGES_NODE).child(chatId);
         String messageId = messagesRef.push().getKey();
         messagesRef.child(messageId).setValue(message);
+
+        // set last message to chat node
+        DatabaseReference chatsRef = Firebase.use().ref().child(CHATS_NODE).child(chatId);
+        chatsRef.child("lastMessage").setValue(message);
     }
 
     // get user details solution
@@ -91,9 +89,9 @@ public class Firebase {
         return users.containsKey(userId);
     }
 
-    public String getRecipientName(Object participants) {
+    public String getRecipientName(HashMap<String, Boolean> participants) {
         String name = "ChaterApp User";
-        String[] ids = ((Map<String, Boolean>) participants).keySet().toArray(new String[0]);
+        String[] ids = participants.keySet().toArray(new String[0]);
         for(String id : ids) {
             if(!Firebase.use().getUserId().equals(id)) {
                 name = Firebase.use().getUser(id).getName();

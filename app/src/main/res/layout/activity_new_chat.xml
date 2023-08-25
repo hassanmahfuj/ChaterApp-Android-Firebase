@@ -39,16 +39,19 @@
         android:orientation="vertical"
         android:padding="8dp">
 
-        <TextView
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Recipient Number:" />
+            android:hint="@string/recipient_number"
+            app:counterEnabled="true"
+            app:counterMaxLength="11">
 
-        <EditText
-            android:id="@+id/txt_recipient_number"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:height="48dp" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/txt_recipient_number"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </com.google.android.material.textfield.TextInputLayout>
 
         <Button
             android:id="@+id/btn_start_chat"

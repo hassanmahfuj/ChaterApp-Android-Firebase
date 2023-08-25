@@ -9,8 +9,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.database.DatabaseReference;
 import com.hum.chaterapp.R;
+import com.hum.chaterapp.model.Chat;
 import com.hum.chaterapp.service.Firebase;
 
 import java.util.HashMap;
@@ -18,9 +21,10 @@ import java.util.Map;
 
 public class NewChatActivity extends AppCompatActivity {
 
-    private EditText txtRecipientNumber;
+    private TextInputEditText txtRecipientNumber;
     private Button btnStartChat;
     private ImageView actionBack;
+    private String recipientNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,9 +36,10 @@ public class NewChatActivity extends AppCompatActivity {
         actionBack = findViewById(R.id.action_back);
 
         btnStartChat.setOnClickListener(view -> {
+            recipientNumber = "+88" + txtRecipientNumber.getText().toString();
             String[] participantIds = new String[]{
                     Firebase.use().getUserId(),
-                    txtRecipientNumber.getText().toString()
+                    recipientNumber
             };
             for (String id : participantIds) {
                 if (!Firebase.use().isUserRegistered(id)) {
@@ -53,21 +58,26 @@ public class NewChatActivity extends AppCompatActivity {
 
         String chatId = chatsRef.push().getKey();
 
-        Map<String, Boolean> participants = new HashMap<>();
+        HashMap<String, Boolean> participants = new HashMap<>();
         for (String participantId : participantIds) {
             participants.put(participantId, true);
         }
 
-        Map<String, Object> chatData = new HashMap<>();
-        chatData.put("chatId", chatId);
-        chatData.put("type", "private");
-        chatData.put("participants", participants);
+        Chat chat = new Chat();
+        chat.setChatId(chatId);
+        chat.setType("private");
+        chat.setParticipants(participants);
 
-        chatsRef.child(chatId).setValue(chatData);
+//        Map<String, Object> chatData = new HashMap<>();
+//        chatData.put("chatId", chatId);
+//        chatData.put("type", "private");
+//        chatData.put("participants", participants);
+
+        chatsRef.child(chatId).setValue(chat);
 
         Intent i = new Intent(NewChatActivity.this, MessagesActivity.class);
         i.putExtra("chatId", chatId);
-        i.putExtra("name", txtRecipientNumber.getText().toString());
+        i.putExtra("name", recipientNumber);
         startActivity(i);
         finish();
     }

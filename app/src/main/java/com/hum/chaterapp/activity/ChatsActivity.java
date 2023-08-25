@@ -22,6 +22,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.hum.chaterapp.R;
 import com.hum.chaterapp.adapter.ChatsAdapter;
+import com.hum.chaterapp.model.Chat;
 import com.hum.chaterapp.model.User;
 import com.hum.chaterapp.service.Firebase;
 
@@ -34,7 +35,7 @@ public class ChatsActivity extends AppCompatActivity {
 
     private FloatingActionButton fab;
     private RecyclerView recChats;
-    private ArrayList<HashMap<String, Object>> chatsList;
+    private ArrayList<Chat> chatsList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,14 +69,12 @@ public class ChatsActivity extends AppCompatActivity {
     public void fetchMessagesForUser(String userId) {
         DatabaseReference userChatsRef = Firebase.use().ref().child("chats");
         Query userChatQuery = userChatsRef.orderByChild("participants/" + userId).equalTo(true);
-        userChatQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+        userChatQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                GenericTypeIndicator<HashMap<String, Object>> _ind = new GenericTypeIndicator<HashMap<String, Object>>() {
-                };
+                chatsList.clear();
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
-                    HashMap<String, Object> map = data.getValue(_ind);
-                    chatsList.add(map);
+                    chatsList.add(data.getValue(Chat.class));
                 }
                 recChats.getAdapter().notifyDataSetChanged();
             }
