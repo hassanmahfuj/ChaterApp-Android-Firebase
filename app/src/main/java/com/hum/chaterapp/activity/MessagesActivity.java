@@ -6,8 +6,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +36,7 @@ public class MessagesActivity extends AppCompatActivity {
     private TextView txtMessage;
     private Button btnSendMessage;
     private ImageView actionBack;
+    private ProgressBar loading;
 
     private ArrayList<Message> messagesList;
     private String chatId;
@@ -48,6 +51,7 @@ public class MessagesActivity extends AppCompatActivity {
         txtMessage = findViewById(R.id.txt_message);
         btnSendMessage = findViewById(R.id.btn_send_message);
         actionBack = findViewById(R.id.action_back);
+        loading = findViewById(R.id.loading);
 
         messagesList = new ArrayList<>();
         MessagesAdapter adapter = new MessagesAdapter(messagesList);
@@ -61,6 +65,7 @@ public class MessagesActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot messagesSnapshot) {
                 messagesList.clear();
+                loading.setVisibility(View.GONE);
                 for (DataSnapshot data : messagesSnapshot.getChildren()) {
                     messagesList.add(data.getValue(Message.class));
                 }
@@ -70,15 +75,19 @@ public class MessagesActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(DatabaseError e) {
+                loading.setVisibility(View.GONE);
                 showMessage(e.getMessage());
             }
         });
 
         btnSendMessage.setOnClickListener(view -> {
+            String msg = txtMessage.getText().toString().trim();
+            if (msg.equals("")) return;
+
             Message message = new Message();
             message.setSenderId(Firebase.use().getUserId());
             message.setTimestamp(System.currentTimeMillis());
-            message.setText(txtMessage.getText().toString());
+            message.setText(msg);
             Firebase.use().sendMessage(chatId, message);
             txtMessage.setText("");
         });

@@ -2,23 +2,16 @@ package com.hum.chaterapp.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
 import com.hum.chaterapp.R;
 import com.hum.chaterapp.activity.MessagesActivity;
 import com.hum.chaterapp.model.Chat;
@@ -27,9 +20,7 @@ import com.hum.chaterapp.service.Firebase;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Locale;
 
 public class ChatsAdapter extends RecyclerView.Adapter<ChatsAdapter.ViewHolder> {
 
@@ -70,14 +61,25 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsAdapter.ViewHolder> 
         // if this is a private message getting the name from user id of recipient
         if (mItems.get(position).getType().equals("private")) {
             holder.txtName.setText(Firebase.use().getRecipientName(mItems.get(position).getParticipants()));
+        } else {
+            holder.txtName.setText(mItems.get(position).getName());
         }
-
-        holder.txtLastMessage.setText(mItems.get(position).getLastMessage().getText());
+        String lastMessage = mItems.get(position).getLastMessage().getText();
+        if (mItems.get(position).getType().equals("group")) {
+            if (mItems.get(position).getLastMessage().getSenderId() != null) {
+                if (mItems.get(position).getLastMessage().getSenderId().equals(Firebase.use().getUserId())) {
+                    lastMessage = "You: ".concat(lastMessage);
+                } else {
+                    lastMessage = Firebase.use().getUser(mItems.get(position).getLastMessage().getSenderId()).getName().concat(": ").concat(lastMessage);
+                }
+            }
+        }
+        holder.txtLastMessage.setText(lastMessage);
         Calendar n = Calendar.getInstance();
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(mItems.get(position).getLastMessage().getTimestamp());
         String format = n.getTimeInMillis() - c.getTimeInMillis() > 1000 * 60 * 60 * 24 ? "dd/MM/yy" : "hh:mm a";
-        holder.txtTimestamp.setText(new SimpleDateFormat(format).format(c.getTime()));
+        holder.txtTimestamp.setText(new SimpleDateFormat(format, Locale.getDefault()).format(c.getTime()));
 
         holder.itemView.setOnClickListener(view -> {
             Intent i = new Intent(holder.itemView.getContext(), MessagesActivity.class);

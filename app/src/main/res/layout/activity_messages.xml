@@ -34,6 +34,12 @@
             android:textSize="22sp" />
     </LinearLayout>
 
+    <ProgressBar
+        android:id="@+id/loading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rec_messages"
         android:layout_width="match_parent"
@@ -57,8 +63,7 @@
             android:background="@drawable/text_input_bg"
             android:hint="Message"
             android:minHeight="39dp"
-            android:paddingHorizontal="16dp"
-            android:textColor="@color/white" />
+            android:paddingHorizontal="16dp" />
 
         <Button
             android:id="@+id/btn_send_message"

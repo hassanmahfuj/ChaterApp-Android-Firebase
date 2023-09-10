@@ -2,7 +2,6 @@ package com.hum.chaterapp.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -10,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,10 +20,7 @@ import com.hum.chaterapp.service.Firebase;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.Locale;
 
 public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHolder> {
     public ArrayList<Message> mItems;
@@ -39,12 +34,14 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
         public LinearLayout linHolder;
         public TextView txtTimestamp;
         public TextView txtMessage;
+        public TextView txtSenderName;
 
         public ViewHolder(View itemView) {
             super(itemView);
             linHolder = itemView.findViewById(R.id.lin_holder);
             txtTimestamp = itemView.findViewById(R.id.txt_timestamp);
             txtMessage = itemView.findViewById(R.id.txt_message);
+            txtSenderName = itemView.findViewById(R.id.txt_sender_name);
         }
     }
 
@@ -65,7 +62,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(mItems.get(position).getTimestamp());
         String format = n.getTimeInMillis() - c.getTimeInMillis() > 1000 * 60 * 60 * 24 ? "dd/MM/yy" : "hh:mm a";
-        holder.txtTimestamp.setText(new SimpleDateFormat(format).format(c.getTime()));
+        holder.txtTimestamp.setText(new SimpleDateFormat(format, Locale.getDefault()).format(c.getTime()));
         holder.txtMessage.setText(mItems.get(position).getText());
 
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
@@ -79,14 +76,21 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
 
         if (Firebase.use().getUserId().equals(mItems.get(position).getSenderId())) {
             holder.linHolder.setBackgroundResource(R.drawable.right_message_bg);
+            holder.txtMessage.setTextColor(Color.parseColor("#FFFFFF"));
+            holder.txtTimestamp.setTextColor(Color.parseColor("#FFFFFF"));
             layoutParams.gravity = Gravity.END;
             leftMargin = pixelToDp(50);
             rightMargin = pixelToDp(5);
+            holder.txtSenderName.setVisibility(View.GONE);
         } else {
             holder.linHolder.setBackgroundResource(R.drawable.left_message_bg);
+            holder.txtMessage.setTextColor(Color.parseColor("#000000"));
+            holder.txtTimestamp.setTextColor(Color.parseColor("#000000"));
             layoutParams.gravity = Gravity.START;
             leftMargin = pixelToDp(5);
             rightMargin = pixelToDp(50);
+            holder.txtSenderName.setVisibility(View.VISIBLE);
+            holder.txtSenderName.setText(Firebase.use().getUser(mItems.get(position).getSenderId()).getName());
         }
 
         layoutParams.setMargins(leftMargin, topMargin, rightMargin, bottomMargin);

@@ -95,8 +95,8 @@ public class Firebase {
     public String getRecipientName(HashMap<String, Boolean> participants) {
         String name = "ChaterApp User";
         String[] ids = participants.keySet().toArray(new String[0]);
-        for(String id : ids) {
-            if(!Firebase.use().getUserId().equals(id)) {
+        for (String id : ids) {
+            if (!Firebase.use().getUserId().equals(id)) {
                 name = Firebase.use().getUser(id).getName();
             }
         }

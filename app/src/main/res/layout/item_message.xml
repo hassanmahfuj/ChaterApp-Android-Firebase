@@ -12,11 +12,18 @@
         android:padding="8dp">
 
         <TextView
+            android:id="@+id/txt_sender_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Username"
+            android:textColor="@color/colorPrimary"
+            android:textSize="11sp" />
+
+        <TextView
             android:id="@+id/txt_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="What's up?"
-            android:textColor="@color/white"
             android:textSize="18sp" />
 
         <TextView
@@ -25,8 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:text="11:41 PM"
-            android:textColor="@color/white"
-            android:textSize="10sp" />
+            android:textSize="11sp" />
     </LinearLayout>
 
 </LinearLayout>

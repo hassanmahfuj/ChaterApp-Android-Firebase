@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
@@ -22,6 +23,7 @@ public class ProfileActivity extends AppCompatActivity {
     private TextInputEditText txtMemberSince;
     private Button btnSave;
     private Button btnLogout;
+    private ImageView actionBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +35,7 @@ public class ProfileActivity extends AppCompatActivity {
         txtMemberSince = findViewById(R.id.txt_member_since);
         btnSave = findViewById(R.id.btn_save);
         btnLogout = findViewById(R.id.btn_logout);
+        actionBack = findViewById(R.id.action_back);
 
         btnSave.setOnClickListener(view -> {
             User u = Firebase.use().getUser();
@@ -45,6 +48,8 @@ public class ProfileActivity extends AppCompatActivity {
             startActivity(new Intent(ProfileActivity.this, LoginActivity.class));
             finishAffinity();
         });
+
+        actionBack.setOnClickListener(view -> finish());
 
         setCurrentUserDetails();
     }
