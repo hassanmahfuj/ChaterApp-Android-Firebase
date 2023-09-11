@@ -37,6 +37,7 @@ public class MessagesActivity extends AppCompatActivity {
     private Button btnSendMessage;
     private ImageView actionBack;
     private ProgressBar loading;
+    private TextView txtNoChats;
 
     private ArrayList<Message> messagesList;
     private String chatId;
@@ -52,6 +53,7 @@ public class MessagesActivity extends AppCompatActivity {
         btnSendMessage = findViewById(R.id.btn_send_message);
         actionBack = findViewById(R.id.action_back);
         loading = findViewById(R.id.loading);
+        txtNoChats = findViewById(R.id.txt_no_chats);
 
         messagesList = new ArrayList<>();
         MessagesAdapter adapter = new MessagesAdapter(messagesList);
@@ -71,11 +73,19 @@ public class MessagesActivity extends AppCompatActivity {
                 }
                 recMessages.getAdapter().notifyDataSetChanged();
                 recMessages.scrollToPosition(messagesList.size() - 1);
+                if (messagesList.size() > 0) {
+                    txtNoChats.setVisibility(View.GONE);
+                } else {
+                    txtNoChats.setVisibility(View.VISIBLE);
+                    txtNoChats.setText("No messages yet!");
+                }
             }
 
             @Override
             public void onCancelled(DatabaseError e) {
                 loading.setVisibility(View.GONE);
+                txtNoChats.setVisibility(View.VISIBLE);
+                txtNoChats.setText(e.getMessage());
                 showMessage(e.getMessage());
             }
         });

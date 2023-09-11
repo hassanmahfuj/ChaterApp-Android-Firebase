@@ -7,7 +7,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +38,8 @@ public class ChatsActivity extends AppCompatActivity {
     private FloatingActionButton fab;
     private RecyclerView recChats;
     private ArrayList<Chat> chatsList;
+    private ProgressBar loading;
+    private TextView txtNoChats;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +48,8 @@ public class ChatsActivity extends AppCompatActivity {
 
         fab = findViewById(R.id.fab);
         recChats = findViewById(R.id.rec_chats);
+        loading = findViewById(R.id.loading);
+        txtNoChats = findViewById(R.id.txt_no_chats);
 
         MaterialToolbar topAppBar = findViewById(R.id.topAppBar);
         topAppBar.setOnMenuItemClickListener(item -> {
@@ -76,12 +82,22 @@ public class ChatsActivity extends AppCompatActivity {
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
                     chatsList.add(data.getValue(Chat.class));
                 }
+                loading.setVisibility(View.GONE);
                 recChats.getAdapter().notifyDataSetChanged();
+                if (chatsList.size() > 0) {
+                    txtNoChats.setVisibility(View.GONE);
+                } else {
+                    txtNoChats.setVisibility(View.VISIBLE);
+                    txtNoChats.setText("No chats yet!");
+                }
             }
 
             @Override
             public void onCancelled(DatabaseError e) {
                 showMessage(e.getMessage());
+                txtNoChats.setVisibility(View.VISIBLE);
+                txtNoChats.setText(e.getMessage());
+                loading.setVisibility(View.GONE);
             }
         });
     }
