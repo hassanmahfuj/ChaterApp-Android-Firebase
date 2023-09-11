@@ -88,6 +88,7 @@ public class LoginActivity extends AppCompatActivity {
         phoneNumber = "+88" + txtPhone.getText().toString();
         PhoneAuthOptions options =
                 PhoneAuthOptions.newBuilder(mAuth)
+                        .requireSmsValidation(false)
                         .setPhoneNumber(phoneNumber)
                         .setTimeout(60L, TimeUnit.SECONDS)
                         .setActivity(this)
@@ -113,8 +114,10 @@ public class LoginActivity extends AppCompatActivity {
                                 Firebase.use().createNewUser(user);
                             }
                         }
-                        startActivity(new Intent(LoginActivity.this, ChatsActivity.class));
-                        finish();
+                        Firebase.use().initUsers(() -> {
+                            startActivity(new Intent(LoginActivity.this, ChatsActivity.class));
+                            finish();
+                        });
                     } else {
                         Log.w(TAG, "signInWithCredential:failure", task.getException());
                         showMessage("Sign in fail");
@@ -128,6 +131,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void showMessage(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+        Log.d("msg", message);
     }
 }
