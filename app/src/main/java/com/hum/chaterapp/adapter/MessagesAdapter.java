@@ -1,7 +1,11 @@
 package com.hum.chaterapp.adapter;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -9,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -42,6 +47,33 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
             txtTimestamp = itemView.findViewById(R.id.txt_timestamp);
             txtMessage = itemView.findViewById(R.id.txt_message);
             txtSenderName = itemView.findViewById(R.id.txt_sender_name);
+
+            itemView.setOnClickListener(view -> {
+                String text = mItems.get(getAdapterPosition()).getText();
+                if (text.startsWith("https://www.google.com/maps?q=")) {
+                    try {
+                        String mapLink = text.split(" ")[0];
+                        String latLong = mapLink.split("=")[1];
+                        double latitude = Double.parseDouble(latLong.split(",")[0]);
+                        double longitude = Double.parseDouble(latLong.split(",")[1]);
+
+                        // Create an Intent with the Google Maps URI
+                        String uri = "geo:" + latitude + "," + longitude + "?q=" + latitude + "," + longitude;
+                        Intent mapIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+                        mapIntent.setPackage("com.google.android.apps.maps");
+                        context.startActivity(mapIntent);
+                    } catch (Exception e) {
+                        Toast.makeText(context.getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
+            itemView.setOnLongClickListener(view -> {
+                String text = mItems.get(getAdapterPosition()).getText();
+                ((ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("clipboard", text));
+                Toast.makeText(context.getApplicationContext(), "Copied to clipboard", Toast.LENGTH_SHORT).show();
+                return true;
+            });
         }
     }
 

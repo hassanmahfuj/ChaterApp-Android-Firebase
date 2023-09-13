@@ -38,6 +38,7 @@ dependencies {
 
     // libs
     implementation 'com.airbnb.android:lottie:6.1.0'
+    implementation 'com.google.android.gms:play-services-location:19.0.1'
 
     // initial
     implementation 'androidx.appcompat:appcompat:1.6.1'

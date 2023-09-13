@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
@@ -41,6 +42,7 @@ public class ProfileActivity extends AppCompatActivity {
             User u = Firebase.use().getUser();
             u.setName(txtUsername.getText().toString());
             Firebase.use().updateUser(u);
+            Toast.makeText(getApplicationContext(), "Profile updated", Toast.LENGTH_SHORT).show();
         });
 
         btnLogout.setOnClickListener(view -> {

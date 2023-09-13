@@ -61,8 +61,10 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsAdapter.ViewHolder> 
         // if this is a private message getting the name from user id of recipient
         if (mItems.get(position).getType().equals("private")) {
             holder.txtName.setText(Firebase.use().getRecipientName(mItems.get(position).getParticipants()));
+            holder.imgPhoto.setImageResource(R.drawable.avatar1);
         } else {
             holder.txtName.setText(mItems.get(position).getName());
+            holder.imgPhoto.setImageResource(R.drawable.chat_group);
         }
         String lastMessage = mItems.get(position).getLastMessage().getText();
         if (mItems.get(position).getType().equals("group")) {
