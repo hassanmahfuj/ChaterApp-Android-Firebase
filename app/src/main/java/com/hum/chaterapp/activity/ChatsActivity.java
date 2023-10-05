@@ -6,32 +6,27 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.hum.chaterapp.R;
 import com.hum.chaterapp.adapter.ChatsAdapter;
 import com.hum.chaterapp.model.Chat;
-import com.hum.chaterapp.model.User;
 import com.hum.chaterapp.service.Firebase;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 public class ChatsActivity extends AppCompatActivity {
 
@@ -82,6 +77,7 @@ public class ChatsActivity extends AppCompatActivity {
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
                     chatsList.add(data.getValue(Chat.class));
                 }
+                sortByTime(chatsList);
                 loading.setVisibility(View.GONE);
                 recChats.getAdapter().notifyDataSetChanged();
                 if (chatsList.size() > 0) {
@@ -104,5 +100,14 @@ public class ChatsActivity extends AppCompatActivity {
 
     private void showMessage(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    private void sortByTime(List<Chat> list) {
+        Collections.sort(list, new Comparator<Chat>() {
+            @Override
+            public int compare(Chat p1, Chat p2) {
+                return Long.compare(p2.getLastMessage().getTimestamp(), p1.getLastMessage().getTimestamp());
+            }
+        });
     }
 }
